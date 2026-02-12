@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  --color-redbull: #3671C6;
+  --color-mclaren: #FF8000;
+  --color-ferrari: #E8002D;
+  --color-mercedes: #27F4D2;
+  --color-astonmartin: #229971;
+  --color-alpine: #0093CC;
+  --color-williams: #64C4FF;
+  --color-haas: #B6BABD;
+  --color-sauber: #52E252;
+  --color-rb: #6692FF;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #f0f0f5;
+  --primary: #e10600;
+  --primary-foreground: #ffffff;
+  --muted: #1a1a2e;
+  --muted-foreground: #9ca3af;
+  --card: #111122;
+  --card-foreground: #f0f0f5;
+  --border: #2a2a3e;
+  --accent: #e10600;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  min-height: 100vh;
+}
+
+/* F1-style gradient backgrounds */
+.f1-gradient {
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1e 100%);
+}
+
+.f1-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.f1-card:hover {
+  border-color: #3a3a4e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Team color accents */
+.team-stripe {
+  width: 4px;
+  border-radius: 2px;
+  min-height: 100%;
+}
+
+/* Position badges */
+.position-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border-radius: 8px;
+  min-width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.position-badge-p1 {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000;
+}
+
+.position-badge-p2 {
+  background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+  color: #000;
+}
+
+.position-badge-p3 {
+  background: linear-gradient(135deg, #CD7F32, #A0522D);
+  color: #fff;
+}
+
+/* Score animations */
+.score-exact {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.score-top3 {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.score-miss {
+  color: #6b7280;
+}
+
+/* Countdown timer */
+.countdown-digit {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 1.25rem;
+  min-width: 48px;
+  text-align: center;
+}
+
+/* Lock indicator */
+.lock-open {
+  color: var(--success);
+}
+
+.lock-closed {
+  color: var(--destructive);
+}
+
+/* Mobile-first responsive helpers */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4a5e;
+}
+
+/* Pulse animation for live indicators */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
