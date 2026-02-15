@@ -89,7 +89,7 @@ export default function AdminResultsPage() {
         .filter(Boolean)
         .map((id: string, i: number) => {
           const d = getDriverById(id);
-          return d ? `P${i + 1}: ${d.emoji} ${d.name}` : `P${i + 1}: ${id}`;
+          return d ? `P${i + 1}: ${d.short} ${d.name}` : `P${i + 1}: ${id}`;
         });
 
       setMessage({

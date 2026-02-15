@@ -71,7 +71,7 @@ export default function ProfilePage() {
                   className="text-xs px-2 py-0.5 rounded font-medium"
                   style={{ backgroundColor: team.color + "20", color: team.color }}
                 >
-                  {team.emoji} {team.name}
+                  {team.name}
                 </span>
               )}
             </div>

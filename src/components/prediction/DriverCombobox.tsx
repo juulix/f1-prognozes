@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { DRIVERS, type Driver } from "@/data/drivers";
 import { getTeamById } from "@/data/teams";
 import { cn } from "@/lib/utils/cn";
@@ -84,7 +85,7 @@ export function DriverCombobox({
               className="team-stripe shrink-0"
               style={{ backgroundColor: selectedTeam.color, height: 20 }}
             />
-            <span>{selectedDriver.emoji}</span>
+            <Image src={selectedDriver.imageUrl} alt={selectedDriver.name} width={24} height={24} className="rounded-full object-cover" unoptimized />
             <span className="text-muted-foreground font-mono text-xs">
               #{selectedDriver.number}
             </span>
@@ -160,8 +161,8 @@ export function DriverCombobox({
                       />
                     )}
 
-                    {/* Driver emoji */}
-                    <span className="text-base">{driver.emoji}</span>
+                    {/* Driver photo */}
+                    <Image src={driver.imageUrl} alt={driver.name} width={28} height={28} className="rounded-full object-cover shrink-0" unoptimized />
 
                     {/* Number */}
                     <span className="text-xs text-muted-foreground font-mono w-7">
@@ -182,7 +183,7 @@ export function DriverCombobox({
                           color: team.color,
                         }}
                       >
-                        {team.emoji} {team.short}
+                        {team.short}
                       </span>
                     )}
 

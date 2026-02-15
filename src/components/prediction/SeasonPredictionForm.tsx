@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { DriverCombobox } from "./DriverCombobox";
 import { TEAMS } from "@/data/teams";
 import { cn } from "@/lib/utils/cn";
@@ -108,7 +109,7 @@ export function SeasonPredictionForm({
                   className="team-stripe shrink-0"
                   style={{ backgroundColor: team.color, height: 20 }}
                 />
-                <span>{team.emoji}</span>
+                <Image src={team.logoUrl} alt={team.name} width={24} height={24} className="object-contain" unoptimized />
                 <span className="font-medium">{team.short}</span>
               </button>
             ))}

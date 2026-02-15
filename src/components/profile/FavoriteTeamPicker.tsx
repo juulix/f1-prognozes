@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { TEAMS } from "@/data/teams";
 import { cn } from "@/lib/utils/cn";
 
@@ -45,7 +46,7 @@ export function FavoriteTeamPicker({ currentTeamId, onSave }: FavoriteTeamPicker
                 : undefined
             }
           >
-            <span className="text-2xl">{team.emoji}</span>
+            <Image src={team.logoUrl} alt={team.name} width={40} height={40} className="object-contain" unoptimized />
             <span
               className="text-xs font-bold"
               style={selected === team.id ? { color: team.color } : undefined}

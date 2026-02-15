@@ -1,4 +1,5 @@
-import { getTeamById, type Team } from "@/data/teams";
+import Image from "next/image";
+import { getTeamById } from "@/data/teams";
 import { cn } from "@/lib/utils/cn";
 
 interface TeamBadgeProps {
@@ -18,6 +19,8 @@ export function TeamBadge({ teamId, size = "md", showName = true, className }: T
     lg: "text-base px-3 py-1.5 gap-2",
   };
 
+  const imgSizes = { sm: 16, md: 20, lg: 28 };
+
   return (
     <span
       className={cn(
@@ -31,7 +34,14 @@ export function TeamBadge({ teamId, size = "md", showName = true, className }: T
         className="team-stripe shrink-0"
         style={{ backgroundColor: team.color, height: size === "sm" ? 12 : size === "md" ? 16 : 20 }}
       />
-      <span>{team.emoji}</span>
+      <Image
+        src={team.logoUrl}
+        alt={team.name}
+        width={imgSizes[size]}
+        height={imgSizes[size]}
+        className="object-contain"
+        unoptimized
+      />
       {showName && <span>{team.short}</span>}
     </span>
   );
