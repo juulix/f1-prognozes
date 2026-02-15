@@ -2,7 +2,7 @@
 
 /**
  * Database connection retry script for Neon PostgreSQL
- * Handles auto-suspend on free tier by retrying connections
+ * Handles auto-suspend on free tier by retrying migrations
  */
 
 const { exec } = require('child_process');
@@ -17,68 +17,57 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function testDatabaseConnection(attempt = 1) {
-  console.log(`[${attempt}/${MAX_RETRIES}] Testing database connection...`);
+async function runMigrationsWithRetry(attempt = 1) {
+  console.log(`[${attempt}/${MAX_RETRIES}] Running database migrations...`);
 
   try {
-    // Use Prisma to test the connection
-    const { stdout, stderr } = await execPromise('npx prisma db execute --stdin <<< "SELECT 1"', {
-      timeout: 10000
+    const { stdout, stderr } = await execPromise('npx prisma migrate deploy', {
+      timeout: 20000
     });
 
-    console.log('✅ Database connection successful!');
+    console.log(stdout);
+    if (stderr && !stderr.includes('warn')) {
+      console.error(stderr);
+    }
+
+    console.log('✅ Migrations completed successfully!');
     return true;
   } catch (error) {
-    const errorMessage = error.message || error.stderr || '';
+    const errorMessage = error.message + (error.stdout || '') + (error.stderr || '');
 
+    // Check for database connection errors
     if (errorMessage.includes('P1001') || errorMessage.includes("Can't reach database")) {
       console.log(`⏳ Database is starting up (attempt ${attempt}/${MAX_RETRIES})...`);
 
       if (attempt < MAX_RETRIES) {
         console.log(`   Waiting ${RETRY_DELAY/1000}s before retry...`);
         await sleep(RETRY_DELAY);
-        return testDatabaseConnection(attempt + 1);
+        return runMigrationsWithRetry(attempt + 1);
       } else {
         console.error('❌ Max retries reached. Database is not responding.');
-        console.error('   This might be a configuration issue. Check your DATABASE_URL.');
+        console.error('   Please check:');
+        console.error('   1. DATABASE_URL environment variable is correct');
+        console.error('   2. Neon database is not suspended (free tier auto-suspends)');
         throw new Error('Database connection failed after maximum retries');
       }
     } else {
-      // Different error - fail immediately
-      console.error('❌ Database connection error:', errorMessage);
+      // Different error - show it and fail
+      console.error('❌ Migration error:', errorMessage);
       throw error;
     }
   }
 }
 
-async function runMigrations() {
-  console.log('\n📦 Running database migrations...');
-
-  try {
-    const { stdout, stderr } = await execPromise('npx prisma migrate deploy');
-    console.log(stdout);
-    if (stderr) console.error(stderr);
-    console.log('✅ Migrations completed successfully!');
-    return true;
-  } catch (error) {
-    console.error('❌ Migration failed:', error.message);
-    throw error;
-  }
-}
-
 async function main() {
-  console.log('🚀 Starting database connection with retry logic...\n');
+  console.log('🚀 Starting database preparation with retry logic...\n');
 
   try {
     // Initial delay to give database time to wake up
-    console.log(`⏳ Waiting ${INITIAL_DELAY/1000}s for database to initialize...`);
+    console.log(`⏳ Waiting ${INITIAL_DELAY/1000}s for database to initialize...\n`);
     await sleep(INITIAL_DELAY);
 
-    // Test connection with retries
-    await testDatabaseConnection();
-
-    // Run migrations
-    await runMigrations();
+    // Run migrations with retry logic
+    await runMigrationsWithRetry();
 
     console.log('\n✅ Database is ready! Starting application...\n');
     process.exit(0);
