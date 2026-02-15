@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && next build",
-    "start": "npx prisma migrate deploy && next start",
+    "start": "node scripts/db-connect-retry.js && next start",
     "lint": "eslint",
     "db:seed": "node prisma/seed.mjs",
     "db:reset": "npx prisma migrate reset --force && npm run db:seed",
