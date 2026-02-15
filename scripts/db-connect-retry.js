@@ -9,9 +9,9 @@ const { exec } = require('child_process');
 const util = require('util');
 const execPromise = util.promisify(exec);
 
-const MAX_RETRIES = 10;
-const RETRY_DELAY = 3000; // 3 seconds
-const INITIAL_DELAY = 2000; // 2 seconds initial wait
+const MAX_RETRIES = 20;
+const RETRY_DELAY = 5000; // 5 seconds
+const INITIAL_DELAY = 5000; // 5 seconds initial wait
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
