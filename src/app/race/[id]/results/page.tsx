@@ -32,15 +32,46 @@ export default function RaceResultsPage({ params }: { params: Promise<{ id: stri
   const [results, setResults] = useState<RaceResult[]>([]);
   const [scores, setScores] = useState<ScoreEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchingFromApi, setFetchingFromApi] = useState(false);
 
   useEffect(() => {
     async function load() {
       try {
         const raceRes = await fetch(`/api/races/${id}`);
+        let raceResults: RaceResult[] = [];
         if (raceRes.ok) {
           const data = await raceRes.json();
-          setResults(data.results || []);
+          raceResults = data.results || [];
         }
+
+        // If no results in DB, try to auto-fetch from F1 API
+        if (raceResults.length === 0) {
+          setFetchingFromApi(true);
+          try {
+            const fetchRes = await fetch("/api/results/fetch-and-save", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ raceId: id }),
+            });
+            if (fetchRes.ok) {
+              const fetchData = await fetchRes.json();
+              if (fetchData.fetched > 0) {
+                // Re-fetch race data with new results
+                const raceRes2 = await fetch(`/api/races/${id}`);
+                if (raceRes2.ok) {
+                  const data2 = await raceRes2.json();
+                  raceResults = data2.results || [];
+                }
+              }
+            }
+          } catch {
+            // F1 API fetch failed, continue with empty results
+          } finally {
+            setFetchingFromApi(false);
+          }
+        }
+
+        setResults(raceResults);
 
         const scoresRes = await fetch(`/api/scores/${id}`);
         if (scoresRes.ok) {
@@ -55,7 +86,18 @@ export default function RaceResultsPage({ params }: { params: Promise<{ id: stri
     load();
   }, [id]);
 
-  if (loading) return <LoadingSpinner size="lg" className="mt-20" />;
+  if (loading || fetchingFromApi) {
+    return (
+      <div className="mt-20">
+        <LoadingSpinner size="lg" />
+        {fetchingFromApi && (
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Ielādē rezultātus no F1 API...
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -63,7 +105,7 @@ export default function RaceResultsPage({ params }: { params: Promise<{ id: stri
 
       {results.length === 0 ? (
         <div className="f1-card p-8 text-center text-muted-foreground">
-          Rezultāti vēl nav ievadīti
+          Rezultāti vēl nav pieejami. F1 API dati parasti parādās dažas stundas pēc sesijas beigām.
         </div>
       ) : (
         <div className="space-y-6">

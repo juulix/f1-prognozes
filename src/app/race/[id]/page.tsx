@@ -6,6 +6,7 @@ import { PredictionForm } from "@/components/prediction/PredictionForm";
 import { CountdownTimer } from "@/components/race/CountdownTimer";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { CALENDAR_2026 } from "@/data/calendar";
+import { isInPast } from "@/lib/utils/dates";
 import Link from "next/link";
 
 interface RaceData {
@@ -96,14 +97,32 @@ export default function RacePage({ params }: { params: Promise<{ id: string }> }
         hasSprint={race.hasSprint}
       />
 
-      {/* Countdown to next session */}
-      <div className="f1-card p-4 mb-6">
-        <h3 className="text-sm font-semibold mb-3">⏰ Nākamā sesija:</h3>
-        <CountdownTimer targetDate={race.raceStart} label="Sacīkstes sākums" />
-      </div>
+      {/* Countdown to next session (only for future races) */}
+      {!isInPast(race.raceStart) && (
+        <div className="f1-card p-4 mb-6">
+          <h3 className="text-sm font-semibold mb-3">⏰ Nākamā sesija:</h3>
+          <CountdownTimer targetDate={race.raceStart} label="Sacīkstes sākums" />
+        </div>
+      )}
 
-      {/* Prediction form */}
-      {!race.isCompleted ? (
+      {/* Results link for past races */}
+      {(race.isCompleted || isInPast(race.raceStart)) && (
+        <div className="f1-card p-6 text-center mb-6">
+          <span className="text-3xl mb-2 block">🏁</span>
+          <p className="font-medium">
+            {race.isCompleted ? "Sacīkstes pabeigtas!" : "Sacīkstes notikušas"}
+          </p>
+          <Link
+            href={`/race/${race.id}/results`}
+            className="inline-block mt-3 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
+          >
+            Skatīt rezultātus →
+          </Link>
+        </div>
+      )}
+
+      {/* Prediction form (show for incomplete races) */}
+      {!race.isCompleted && (
         <PredictionForm
           raceId={race.id}
           raceName={race.name}
@@ -113,17 +132,6 @@ export default function RacePage({ params }: { params: Promise<{ id: string }> }
           raceStart={race.raceStart}
           existingPredictions={predictions}
         />
-      ) : (
-        <div className="f1-card p-6 text-center">
-          <span className="text-3xl mb-2 block">🏁</span>
-          <p className="font-medium">Sacīkstes pabeigtas!</p>
-          <Link
-            href={`/race/${race.id}/results`}
-            className="inline-block mt-3 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium"
-          >
-            Skatīt rezultātus →
-          </Link>
-        </div>
       )}
     </div>
   );
