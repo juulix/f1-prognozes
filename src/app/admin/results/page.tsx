@@ -106,6 +106,38 @@ export default function AdminResultsPage() {
     }
   }
 
+  async function handleAutoFetchAndSave() {
+    if (!selectedRace) return;
+    setFetching(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/results/fetch-and-save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ raceId: selectedRace.id }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Kļūda");
+      }
+
+      const data = await res.json();
+      setMessage({
+        type: data.fetched > 0 ? "success" : "info",
+        text: data.message,
+      });
+    } catch (err) {
+      setMessage({
+        type: "error",
+        text: err instanceof Error ? err.message : "Neizdevās ielādēt",
+      });
+    } finally {
+      setFetching(false);
+    }
+  }
+
   async function handleSave() {
     if (!selectedRace || !p1) {
       setMessage({ type: "error", text: "Izvēlies sacīkstes un P1!" });
@@ -214,7 +246,22 @@ export default function AdminResultsPage() {
               ))}
           </div>
 
-          {/* Auto-fetch from F1 API */}
+          {/* Auto-fetch and save all sessions */}
+          <button
+            onClick={handleAutoFetchAndSave}
+            disabled={fetching}
+            className="w-full mb-2 py-3 rounded-lg bg-green-600 text-white font-semibold text-sm hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {fetching ? (
+              <span className="animate-pulse">Ielādē no F1 API...</span>
+            ) : (
+              "Automātiski ielādēt un saglabāt visas sesijas"
+            )}
+          </button>
+
+          <div className="text-center text-xs text-muted-foreground mb-4">vai manuāli:</div>
+
+          {/* Manual fetch from F1 API */}
           <button
             onClick={handleFetchFromAPI}
             disabled={fetching}
@@ -223,7 +270,7 @@ export default function AdminResultsPage() {
             {fetching ? (
               <span className="animate-pulse">Ielādē no F1 API...</span>
             ) : (
-              "Ielādēt rezultātus no F1 API"
+              "Ielādēt šīs sesijas rezultātus no F1 API"
             )}
           </button>
 
